@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Car</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container" th:object="${car}">
+        <div class="row">
+            <div class="card col-3 mb-3" th:each="carToMediaItem : *{getCarToMediaItems()}">
+                <img th:src="@{/api/v1/media-items/file/{mediaItemId}(mediaItemId=${carToMediaItem.mediaItem.id})}"
+                     class="card-img-top">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5">
+                <label for="manufacturer" class="form-label">Manufacturer</label>
+                <input type="text" class="form-control" id="manufacturer" th:value="*{manufacturer}" disabled>
+            </div>
+            <div class="col-5">
+                <label for="model" class="form-label">Model</label>
+                <input type="text" class="form-control" id="model" th:value="*{model}" disabled>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5">
+                <label for="type" class="form-label">Type</label>
+                <select id="type" class="form-select" disabled>
+                    <option th:value="*{type}" th:text="*{type}" selected>CarType </option>
+                </select>
+            </div>
+            <div class="col-5">
+                <label for="year" class="form-label">Year</label>
+                <input type="text" class="form-control" id="year" th:value="*{year}" disabled>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-5">
+                <label for="horsepower" class="form-label">Horsepower</label>
+                <input type="text" class="form-control" id="horsepower" th:value="*{horsepower}" disabled>
+            </div>
+            <div class="col-5">
+                <label for="price" class="form-label">Price</label>
+                <input type="text" class="form-control" id="price" th:value="*{price}" disabled>
+            </div>
+        </div>
+    </div>
+</section>
+</body>
+</html>

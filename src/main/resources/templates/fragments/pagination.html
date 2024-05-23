@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Pagination</title>
+</head>
+<body>
+
+<select name="page" class="form-select" aria-label="filter" th:fragment="pages(countPages, metadataPage)">
+    <option th:each="page : ${#numbers.sequence(0, __${countPages}__)}"
+            th:value="${page}"
+            th:text="${page + 1}"
+            th:selected="${page == metadataPage}">
+        PageNumber
+    </option>
+</select>
+
+<input th:fragment="size(metadataSize)"
+       type="text"
+       class="form-control"
+       aria-label="filter"
+       name="size"
+       th:value="${metadataSize}">
+
+</body>
+</html>

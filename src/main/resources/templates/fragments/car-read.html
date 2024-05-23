@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>CarRead</title>
+</head>
+<body>
+
+<div th:fragment="car(car)">
+    <div class="row">
+        <div class="card col-3 mb-3" th:each="carToMediaItem : *{car.carToMediaItems}">
+            <img th:src="@{/api/v1/media-items/file/{mediaItemId}(mediaItemId=${carToMediaItem.mediaItem.id})}"
+                 class="card-img-top">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <label for="manufacturer" class="form-label">Manufacturer</label>
+            <input type="text" class="form-control" id="manufacturer" th:value="*{car.manufacturer}" disabled>
+        </div>
+        <div class="col-6">
+            <label for="model" class="form-label">Model</label>
+            <input type="text" class="form-control" id="model" th:value="*{car.model}" disabled>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <label for="type" class="form-label">Type</label>
+            <select id="type" class="form-select" disabled>
+                <option th:value="*{car.type}" th:text="*{car.type}" selected>CarType</option>
+            </select>
+        </div>
+        <div class="col-6">
+            <label for="year" class="form-label">Year</label>
+            <input type="text" class="form-control" id="year" th:value="*{car.year}" disabled>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <label for="horsepower" class="form-label">Horsepower</label>
+            <input type="text" class="form-control" id="horsepower" th:value="*{car.horsepower}" disabled>
+        </div>
+        <div class="col-6">
+            <label for="price" class="form-label">Price</label>
+            <input type="text" class="form-control" id="price" th:value="*{car.price}" disabled>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

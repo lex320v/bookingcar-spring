@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Feedbacks</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container">
+        <div th:replace="~{fragments/car-read :: car(${car})}"></div>
+
+        <hr class="my-4">
+
+        <form th:action="@{/feedbacks}">
+            <div class="input-group mb-3">
+                <span class="input-group-text">Page:</span>
+                <select th:replace="~{fragments/pagination :: pages(${countPages}, ${feedbacks.metadata.page})}"></select>
+
+                <span class="input-group-text">Size:</span>
+                <input th:replace="~{fragments/pagination :: size(${feedbacks.metadata.size})}">
+            </div>
+
+            <input type="hidden" name="carId" th:value="${car.id}">
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">rating</th>
+                <th scope="col">comment</th>
+                <th scope="col">author</th>
+                <th scope="col">createdAt</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="feedback : ${feedbacks.content}">
+                <td th:text="${feedback.id}">id</td>
+                <td th:text="${feedback.rating}">rating</td>
+                <td th:text="${feedback.text}">text</td>
+                <td>
+                    <a th:href="@{'/users/' + ${feedback.authorId}}" th:text="${feedback.authorUsername}"></a>
+                </td>
+                <td th:text="${feedback.createdAt}">createdAt</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

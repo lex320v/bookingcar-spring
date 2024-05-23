@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Create admin</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container" th:object="${user}">
+        <h2 class="mt-4 mb-4 text-center">Create Admin</h2>
+        <form th:action="@{/admins}" method="post">
+            <div class="row">
+                <div class="col-6 form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" class="form-control" id="username" name="username" th:value="*{username}">
+                </div>
+                <div class="col-6 form-group">
+                    <label for="password">Password:</label>
+                    <input type="text" class="form-control" id="password" name="password" th:value="*{password}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6 form-group">
+                    <label for="firstname">Firstname:</label>
+                    <input type="text" class="form-control" id="firstname" name="firstname" th:value="*{firstname}">
+                </div>
+                <div class="col-6 form-group">
+                    <label for="lastname">Lastname:</label>
+                    <input type="text" class="form-control" id="lastname" name="lastname" th:value="*{lastname}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6 form-group">
+                    <label for="birthDate">Birth Date:</label>
+                    <input type="date"
+                           id="birthDate"
+                           class="form-control"
+                           name="birthDate"
+                           th:value="*{birthDate}">
+                </div>
+                <div class="col-6"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-6 form-group">
+                    <label for="birthDate">Gender:</label>
+                    <div th:each="gender : ${genders}">
+                        <label class="form-check-label"
+                               th:for="${gender}"
+                               th:text="${gender}">Gender</label>
+                        <input class="form-check-input"
+                               type="radio"
+                               name="gender"
+                               th:id="${gender}"
+                               th:value="${gender}"
+                               th:checked="${gender == user.gender}">
+                    </div>
+                </div>
+                <div class="col-6 form-group">
+                    <label for="birthDate">Role:</label>
+                    <label class="form-check-label" for="role">ADMIN</label>
+                    <input class="form-check-input"
+                           type="radio"
+                           name="role"
+                           id="role"
+                           value="ADMIN"
+                           checked>
+                </div>
+            </div>
+
+            <div class="row">
+                <button class="w-100 btn btn-primary" type="submit">create admin</button>
+            </div>
+        </form>
+        <div th:if="${errors}">
+            <p class="alert alert-danger"
+               style="color: red"
+               th:each="error : ${errors}"
+               th:text="${error.defaultMessage}"
+            >Error message</p>
+        </div>
+    </div>
+</section>
+</body>
+</html>

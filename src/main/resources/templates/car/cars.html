@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Cars</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container">
+        <form action="/cars" onsubmit="convertToUTC()">
+            <div class="input-group mb-3">
+                <span class="input-group-text">Search:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="search"
+                       th:value="${filter.search}">
+
+                <span class="input-group-text">Type:</span>
+                <select name="type" class="form-select" aria-label="filter">
+                    <option th:each="carType : ${carTypes}"
+                            th:value="${carType}"
+                            th:text="${carType}"
+                            th:selected="${carType == filter.type?.toString()}">CarType:
+                    </option>
+                </select>
+                <span class="input-group-text">Booking Status:</span>
+                <select name="bookingStatus" class="form-select" aria-label="filter">
+                    <option th:each="bookingStatus : ${bookingStatuses}"
+                            th:value="${bookingStatus}"
+                            th:text="${bookingStatus}"
+                            th:selected="${bookingStatus == filter.bookingStatus}">BookingStatus:
+                    </option>
+                </select>
+                <span class="input-group-text">DateTimeFrom:</span>
+                <input type="hidden" name="dateTimeFrom" id="dateTimeFrom">
+                <input type="datetime-local"
+                       class="form-control"
+                       aria-label="filter"
+                       id="dateTimeFromLocal"
+                       name="dateTimeFromLocal"
+                       th:value="${localBookingDatesDto.dateTimeFromLocal}">
+
+                <span class="input-group-text">DateTimeTo:</span>
+                <input type="hidden" name="dateTimeTo" id="dateTimeTo">
+                <input type="datetime-local"
+                       class="form-control"
+                       aria-label="filter"
+                       id="dateTimeToLocal"
+                       name="dateTimeToLocal"
+                       th:value="${localBookingDatesDto.getDateTimeToLocal()}">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">MinPrice:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="minPrice"
+                       th:value="${filter.minPrice}">
+                <span class="input-group-text">MaxPrice:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="maxPrice"
+                       th:value="${filter.maxPrice}">
+                <span class="input-group-text">MinYear:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="minYear"
+                       th:value="${filter.minYear}">
+                <span class="input-group-text">MaxYear:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="maxYear"
+                       th:value="${filter.maxYear}">
+                <span class="input-group-text">MinHorsepower:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="minHorsepower"
+                       th:value="${filter.minHorsepower}">
+                <span class="input-group-text">MaxHorsepower:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="maxHorsepower"
+                       th:value="${filter.maxHorsepower}">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Page:</span>
+                <select th:replace="~{fragments/pagination :: pages(${countPages}, ${cars.metadata.page})}"></select>
+
+                <span class="input-group-text">Size:</span>
+                <input th:replace="~{fragments/pagination :: size(${cars.metadata.size})}">
+
+                <span class="input-group-text">SortField:</span>
+                <select name="sortField" class="form-select" aria-label="filter">
+                    <option th:each="sortField : ${sortFields}"
+                            th:value="${sortField}"
+                            th:text="${sortField}"
+                            th:selected="${sortField.toString() ==  page.sortField}">sortField
+                    </option>
+                </select>
+                <div class="input-group-text" th:each="sortDirection : ${sortDirections}">
+                    <label class="form-check-label" th:for="${sortDirection}"
+                           th:text="${sortDirection}">sortDirection:</label>
+                    <input
+                            class="form-check-input mt-0"
+                            type="radio"
+                            name="sortDirection"
+                            th:id="${sortDirection}"
+                            th:value="${sortDirection}"
+                            th:checked="${sortDirection == page.sortDirection}">
+                </div>
+
+                <div th:if="${#authentication.principal.authorities[0].toString() == 'OWNER'}" class="d-flex">
+                    <div class="input-group-text">
+                        <label class="form-check-label" for="myCars">MyCars:</label>
+                        <input type="checkbox" class="form-check-input" id="myCars" name="myCars"
+                               th:checked="*{filter.myCars}">
+                    </div>
+                    <span class="input-group-text">Active Status:</span>
+                    <select name="active" class="form-select" aria-label="filter">
+                        <option th:selected="${null == filter.active}"></option>
+                        <option value="true" th:selected="${true == filter.active}">true</option>
+                        <option value="false" th:selected="${false == filter.active}">false</option>
+                    </select>
+                </div>
+
+            </div>
+            <div th:if="${errors}">
+                <p style="color: red" th:each="error : ${errors}" th:text="${error.defaultMessage}">Error message</p>
+            </div>
+            <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col" th:if="${filter.myCars}">active</th>
+                <th scope="col">manufacturer</th>
+                <th scope="col">model</th>
+                <th scope="col">horsepower</th>
+                <th scope="col">year</th>
+                <th scope="col">price</th>
+                <th scope="col">type</th>
+                <th scope="col">active</th>
+                <th scope="col">image</th>
+                <th scope="col">sum</th>
+                <th scope="col">count</th>
+                <th scope="col">avg</th>
+                <th scope="col">feedbacks</th>
+                <th scope="col">free</th>
+                <th scope="col">ownerProfile</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="car : ${cars.content}">
+                <th th:if="${#authentication.principal.authorities[0].toString() != 'CLIENT'}">
+                    <a th:href="@{'/cars/' + ${car.id}}" th:text="${car.id}">id</a>
+                </th>
+                <th scope="col" th:if="${filter.myCars}" th:text="${car.active}">active</th>
+                <th th:unless="${#authentication.principal.authorities[0].toString() != 'CLIENT'}">
+                    <a th:href="@{'/requests/create?carId=' + ${car.id}
+                            + '&dateTimeFromLocal=' + ${localBookingDatesDto.dateTimeFromLocal ?: ''}
+                            + '&dateTimeToLocal=' + ${localBookingDatesDto.dateTimeToLocal ?: ''}}"
+                       th:text="${car.id}">id</a>
+                </th>
+                <td th:text="${car.manufacturer}">manufacturer</td>
+                <td th:text="${car.model}">model</td>
+                <td th:text="${car.horsepower}">horsepower</td>
+                <td th:text="${car.year}">year</td>
+                <td th:text="${car.price}">price</td>
+                <td th:text="${car.type}">type</td>
+                <td th:text="${car.active}">active</td>
+                <td>
+                    <img th:if="${car.previewMediaItemId != null}"
+                         th:src="@{'/api/v1/media-items/file/' + ${car.previewMediaItemId}}"
+                         style="max-width: 80px">
+                    <img th:unless="${car.previewMediaItemId != null}"
+                         src="/images/car-default.png"
+                         style="max-width: 80px">
+                </td>
+                <td th:text="${car.sumRating}">sumRating</td>
+                <td th:text="${car.countRating}">countRating</td>
+                <td th:text="${car.avgRating}">avgRating</td>
+                <td><a th:href="@{'/feedbacks?carId=' + ${car.id}}">feedbacks</a></td>
+                <td th:text="${car.free}">free</td>
+                <td><a th:href="@{'/users/' + ${car.owner.id}}" th:text="${car.owner.username}"></a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function convertToUTC() {
+            const dateTimeFrom = document.getElementById("dateTimeFromLocal").value;
+            const dateTimeTo = document.getElementById("dateTimeToLocal").value;
+
+            document.getElementById("dateTimeFrom").value = new Date(dateTimeFrom).toISOString();
+            document.getElementById("dateTimeTo").value = new Date(dateTimeTo).toISOString();
+        }
+    </script>
+</section>
+</body>
+</html>

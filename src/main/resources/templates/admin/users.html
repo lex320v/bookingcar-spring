@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Users</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container">
+        <form action="/admins/users">
+            <div class="input-group mb-3 mt-3">
+                <span class="input-group-text">Firstname:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="firstname"
+                       th:value="${filter.firstname}">
+                <span class="input-group-text">Lastname:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="lastname"
+                       th:value="${filter.lastname}">
+                <span class="input-group-text">Username:</span>
+                <input type="text"
+                       class="form-control"
+                       aria-label="filter"
+                       name="username"
+                       th:value="${filter.username}">
+                <span class="input-group-text">Role:</span>
+                <select name="role" class="form-select" aria-label="filter">
+                    <option th:each="role : ${roles}"
+                            th:value="${role}"
+                            th:text="${role}"
+                            th:selected="${role == filter.role?.toString()}">Role
+                    </option>
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">Page:</span>
+                <select th:replace="~{fragments/pagination :: pages(${countPages}, ${users.metadata.page})}"></select>
+
+                <span class="input-group-text">Size:</span>
+                <input th:replace="~{fragments/pagination :: size(${users.metadata.size})}">
+
+                <span class="input-group-text">SortField:</span>
+                <select name="sortField" class="form-select" aria-label="filter">
+                    <option th:each="sortField : ${sortFields}"
+                            th:value="${sortField}"
+                            th:text="${sortField}"
+                            th:selected="${sortField.toString() ==  page.sortField}">sortField
+                    </option>
+                </select>
+                <div class="input-group-text" th:each="sortDirection : ${sortDirections}">
+                    <label class="form-check-label" th:for="${sortDirection}"
+                           th:text="${sortDirection}">sortDirection</label>
+                    <input class="form-check-input mt-0"
+                           type="radio"
+                           name="sortDirection"
+                           th:id="${sortDirection}"
+                           th:value="${sortDirection}"
+                           th:checked="${sortDirection == page.sortDirection}">
+                </div>
+            </div>
+            <button class="btn btn-primary" type="submit">Filter</button>
+        </form>
+
+        <table class="table">
+            <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">username</th>
+                <th scope="col">firstname</th>
+                <th scope="col">lastname</th>
+                <th scope="col">role</th>
+                <th scope="col">status</th>
+                <th scope="col">action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users.content}">
+                <th>
+                    <a th:href="@{'/users/' + ${user.id}}" th:text="${user.id}">id</a>
+                </th>
+                <td th:text="${user.username}">username</td>
+                <td th:text="${user.firstname}">firstname</td>
+                <td th:text="${user.lastname}">lastname</td>
+                <td th:text="${user.role}">role</td>
+                <td th:text="${user.status}">status</td>
+                <td class="d-flex">
+                    <form class="me-3" th:action="@{'/admins/users/edit-status/' + ${user.id}}" method="post">
+                        <input type="hidden"
+                               name="status"
+                               th:value="${user.status.toString() == 'ACTIVE' ? 'INACTIVE' : 'ACTIVE'}">
+                        <button class="btn btn-warning"
+                                th:text="${user.status.toString() == 'ACTIVE' ? 'block' : 'unblock'}"
+                                th:disabled="${#authentication.principal.authorities[0].toString() == 'ADMIN'
+                                && (user.role.toString() == 'ADMIN' || user.role.toString() == 'SUPER_ADMIN')}">
+                        </button>
+                    </form>
+                    <form th:action="'/users/' + ${user.id} + '/delete'" method="post">
+                        <button class="btn btn-danger"
+                                th:disabled="${#authentication.principal.authorities[0].toString() == 'ADMIN'
+                                && (user.role.toString() == 'ADMIN' || user.role.toString() == 'SUPER_ADMIN')}"
+                        >delete</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

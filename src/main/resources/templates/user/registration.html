@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+</head>
+<body>
+<div class="container" th:object="${user}">
+    <h2 class="mt-4 mb-4 text-center">Registration</h2>
+
+    <form th:action="@{/users/sign-up}" method="post">
+        <div class="row justify-content-center">
+            <div class="col-5 form-group">
+                <label for="username">Username:</label>
+                <input type="text" class="form-control" id="username" name="username" th:value="*{username}">
+            </div>
+            <div class="col-5 form-group">
+                <label for="password">Password:</label>
+                <input type="text" class="form-control" id="password" name="password" th:value="*{password}">
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-5 form-group">
+                <label for="firstname">Firstname:</label>
+                <input type="text" class="form-control" id="firstname" name="firstname" th:value="*{firstname}">
+            </div>
+            <div class="col-5 form-group">
+                <label for="lastname">Lastname:</label>
+                <input type="text" class="form-control" id="lastname" name="lastname" th:value="*{lastname}">
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-5 form-group">
+                <label for="birthDate">Birth Date:</label>
+                <input type="date"
+                       id="birthDate"
+                       class="form-control"
+                       name="birthDate"
+                       th:value="*{birthDate}">
+            </div>
+            <div class="col-5"></div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-5 form-group">
+                <label for="birthDate">Gender:</label>
+                <div th:each="gender : ${genders}">
+                    <label class="form-check-label"
+                           th:for="${gender}"
+                           th:text="${gender}">Gender</label>
+                    <input class="form-check-input"
+                           type="radio"
+                           name="gender"
+                           th:id="${gender}"
+                           th:value="${gender}"
+                           th:checked="${gender == user.gender}">
+                </div>
+            </div>
+            <div class="col-5 form-group">
+                <label for="birthDate">Role:</label>
+                <div th:each="role : ${roles}">
+                    <label class="form-check-label"
+                           th:for="${role}"
+                           th:text="${role}">Role</label>
+                    <input class="form-check-input"
+                           type="radio"
+                           name="role"
+                           th:id="${role}"
+                           th:value="${role}"
+                           th:checked="${role == user.role}">
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <button class="col-10 btn btn-primary" type="submit">Register</button>
+        </div>
+    </form>
+    <div th:if="${errors}">
+        <p style="color: red" th:each="error : ${errors}" th:text="${error.defaultMessage}">Error message</p>
+    </div>
+</div>
+</body>
+</html>

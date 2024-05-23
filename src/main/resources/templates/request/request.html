@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Request</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container" th:object="${request}">
+        <div th:replace="~{fragments/car-read :: car(${request.car})}"></div>
+
+        <hr class="my-4">
+
+        <form th:action="@{/feedbacks}" method="post">
+            <div class="row">
+                <div class="col-6">
+                    <label for="requestId">Request Id:</label>
+                    <input type="text"
+                           class="form-control"
+                           id="requestId"
+                           th:value="${request.id}"
+                           disabled>
+                </div>
+                <div class="col-6">
+                    <label for="rating" class="form-label">Rating:</label>
+                    <select id="rating"
+                            name="rating"
+                            class="form-select"
+                            th:disabled="${request.status.toString() != 'FINISHED'
+                            || #authentication.principal.authorities[0].toString() == 'OWNER'}">
+                        <option value=""></option>
+                        <option th:each="ratingValue : ${#numbers.sequence(__${minRating}__, __${maxRating}__)}"
+                                th:value="${ratingValue}"
+                                th:text="${ratingValue}"
+                                th:selected="${request.feedback?.rating == ratingValue}"
+                        >rating
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-6">
+                    <label for="dateTimeFrom">Status:</label>
+                    <input type="text"
+                           class="form-control"
+                           id="status"
+                           th:value="*{status}"
+                           disabled>
+                </div>
+
+                <div class="col-6">
+                    <label for="text" class="form-label">Comment:</label>
+                    <input type="text"
+                           class="form-control"
+                           id="text"
+                           name="text"
+                           th:value="${request.feedback?.text}"
+                           th:disabled="${request.status.toString() != 'FINISHED'
+                           || #authentication.principal.authorities[0].toString() == 'OWNER'}">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-3">
+                    <label for="dateTimeFrom">From:</label>
+                    <input type="text"
+                           class="form-control"
+                           id="dateTimeFrom"
+                           th:value="*{dateTimeFrom}"
+                           disabled>
+                </div>
+                <div class="col-3">
+                    <label for="dateTimeTo">To:</label>
+                    <input type="text"
+                           class="form-control"
+                           id="dateTimeTo"
+                           th:value="*{dateTimeTo}"
+                           disabled>
+                </div>
+                <div class="col-6">
+                    <input type="hidden" name="requestId" th:value="${request.id}">
+                    <button class="btn btn-primary mt-4"
+                            type="submit"
+                            th:if="${#authentication.principal.authorities[0].toString() == 'CLIENT'}"
+                            th:disabled="${request.status.toString() != 'FINISHED'}"
+                    >Save Feedback
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+</body>
+</html>

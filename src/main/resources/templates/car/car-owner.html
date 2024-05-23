@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Car</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container">
+        <div class="row justify-content-start mb-3 mt-3">
+            <div class="card col-3 mb-3" th:each="carToMediaItem : ${car.getCarToMediaItems()}">
+                <img th:src="@{/api/v1/media-items/file/{mediaItemId}(mediaItemId=${carToMediaItem.mediaItem.id})}"
+                     class="card-img-top">
+
+                <div class="card-body d-flex">
+                    <form th:action="@{/cars/{carId}/change-position(carId=${car.id})}" method="post"
+                          class="align-self-end">
+                        <div class="input-group ">
+                            <span class="input-group-text">Position</span>
+                            <input type="text" class="form-control" name="position"
+                                   th:value="${carToMediaItem.position}">
+                            <input type="hidden" name="mediaItemId" th:value="${carToMediaItem.mediaItem.id}">
+                            <button class="btn btn-success" type="submit">Change</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card-footer text-end">
+                    <form th:action="@{/cars/{carId}/detach-media(carId=${car.id})}" method="post">
+                        <input type="hidden" name="mediaItemId" th:value="${carToMediaItem.mediaItem.id}">
+                        <button type="submit" class="btn btn-danger btn-sm">Remove attachment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3">
+            <form th:action="@{/cars/{carId}/attach-media(carId=${car.id})}" method="post"
+                  enctype="multipart/form-data">
+                <label for="media" class="form-label">Attach media</label>
+                <input class="form-control mb-3" type="file" id="media" name="file">
+                <button class="w-100 btn btn-primary" type="submit">Attach media</button>
+            </form>
+        </div>
+        <hr class="my-4">
+
+        <form th:action="@{/cars/{carId}/update(carId=${car.id})}" method="post" th:object="${car}">
+            <div class="row">
+                <div class="col-5">
+                    <label for="manufacturer" class="form-label">Manufacturer</label>
+                    <input type="text" class="form-control" id="manufacturer" name="manufacturer"
+                           th:value="*{manufacturer}">
+                </div>
+                <div class="col-5">
+                    <label for="model" class="form-label">Model</label>
+                    <input type="text" class="form-control" id="model" name="model" th:value="*{model}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-5">
+                    <label for="type" class="form-label">Type</label>
+                    <select id="type" name="type" class="form-select">
+                        <option th:each="carType : ${carTypeValues}"
+                                th:value="${carType}"
+                                th:text="${carType}"
+                                th:selected="${carType} == *{type}">CarType
+                        </option>
+                    </select>
+                </div>
+                <div class="col-5">
+                    <label for="year" class="form-label">Year</label>
+                    <input type="text" class="form-control" id="year" name="year" th:value="*{year}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-5">
+                    <label for="horsepower" class="form-label">Horsepower</label>
+                    <input type="text" class="form-control" id="horsepower" name="horsepower" th:value="*{horsepower}">
+                </div>
+                <div class="col-5 mb-3">
+                    <label for="price" class="form-label">Price</label>
+                    <input type="text" class="form-control" id="price" name="price" th:value="*{price}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3 mb-3">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="active" name="active"
+                               th:checked="*{active}">
+                        <label class="form-check-label" for="active">active</label>
+                    </div>
+                </div>
+            </div>
+            <button class="w-100 btn btn-primary" type="submit">update</button>
+        </form>
+        <div th:if="${errors}">
+            <p style="color: red" th:each="error : ${errors}" th:text="${error.defaultMessage}">Error message</p>
+        </div>
+
+        <hr class="my-4">
+        <form th:action="@{/cars/{carId}/delete(carId=${car.id})}" method="post">
+            <button class="w-100 btn btn-danger" type="submit">delete</button>
+        </form>
+        <hr class="my-4">
+    </div>
+</section>
+</body>
+</html>

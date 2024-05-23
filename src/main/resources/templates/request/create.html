@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Request create</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container" th:object="${car}">
+        <div class="row mt-3">
+            <div class="card col-3 mb-3" th:each="carToMediaItem : *{getCarToMediaItems()}">
+                <img th:src="@{/api/v1/media-items/file/{mediaItemId}(mediaItemId=${carToMediaItem.mediaItem.id})}"
+                     class="card-img-top">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5">
+                <label for="manufacturer" class="form-label">Manufacturer</label>
+                <input type="text" class="form-control" id="manufacturer" th:value="*{manufacturer}" disabled>
+            </div>
+            <div class="col-5">
+                <label for="model" class="form-label">Model</label>
+                <input type="text" class="form-control" id="model" th:value="*{model}" disabled>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5">
+                <label for="type" class="form-label">Type</label>
+                <select id="type" class="form-select" disabled>
+                    <option th:value="*{type}" th:text="*{type}" selected>CarType</option>
+                </select>
+            </div>
+            <div class="col-5">
+                <label for="year" class="form-label">Year</label>
+                <input type="text" class="form-control" id="year" th:value="*{year}" disabled>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-5">
+                <label for="horsepower" class="form-label">Horsepower</label>
+                <input type="text" class="form-control" id="horsepower" th:value="*{horsepower}" disabled>
+            </div>
+            <div class="col-5">
+                <label for="price" class="form-label">Price</label>
+                <input type="text" class="form-control" id="price" th:value="*{price}" disabled>
+            </div>
+        </div>
+        <hr class="my-4">
+        <form th:action="@{/requests}" method="post" onsubmit="convertToUTC()">
+            <div class="row">
+                <div class="form-group col-5">
+                    <input type="hidden" name="dateTimeFrom" id="dateTimeFrom">
+                    <label for="dateTimeFromLocal">From:</label>
+                    <input type="datetime-local"
+                           class="form-control"
+                           id="dateTimeFromLocal"
+                           name="dateTimeFromLocal"
+                           th:value="${localBookingDatesDto.dateTimeFromLocal}">
+                </div>
+                <div class="form-group col-5">
+                    <input type="hidden" name="dateTimeTo" id="dateTimeTo">
+                    <label for="dateTimeToLocal">To:</label>
+                    <input type="datetime-local"
+                           class="form-control"
+                           id="dateTimeToLocal"
+                           name="dateTimeToLocal"
+                           th:value="${localBookingDatesDto.dateTimeToLocal}">
+                </div>
+                <input type="hidden" th:value="${car.id}" name="carId">
+                <hr class="my-4">
+                <button class="btn btn-primary btn-lg" type="submit">Create Request</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function convertToUTC() {
+            const dateTimeFrom = document.getElementById("dateTimeFromLocal").value;
+            const dateTimeTo = document.getElementById("dateTimeToLocal").value;
+
+            document.getElementById("dateTimeFrom").value = new Date(dateTimeFrom).toISOString();
+            document.getElementById("dateTimeTo").value = new Date(dateTimeTo).toISOString();
+        }
+    </script>
+</section>
+</body>
+</html>

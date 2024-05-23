@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{/fragments/layouts/base_layout}">
+<head>
+    <title>Requests</title>
+</head>
+<body>
+<section layout:fragment="content">
+    <div class="container">
+        <form action="/requests">
+            <div class="input-group mb-3">
+                <span class="input-group-text">Status:</span>
+                <select name="requestStatus" class="form-select" aria-label="filter">
+                    <option th:each="requestStatus : ${requestStatuses}"
+                            th:value="${requestStatus}"
+                            th:text="${requestStatus}"
+                            th:selected="${requestStatus == filter.status?.toString()}">Status:
+                    </option>
+                </select>
+            </div>
+
+            <div class="input-group mb-3">
+                <span class="input-group-text">Page:</span>
+                <select th:replace="~{fragments/pagination :: pages(${countPages}, ${requests.metadata.page})}"></select>
+
+                <span class="input-group-text">Size:</span>
+                <input th:replace="~{fragments/pagination :: size(${requests.metadata.size})}">
+
+                <span class="input-group-text">SortField:</span>
+                <select name="sortField" class="form-select" aria-label="filter" disabled>
+                    <option th:value="createdAt"
+                            th:text="createdAt"
+                            th:selected="createdAt">sortField
+                    </option>
+                </select>
+                <div class="input-group-text" th:each="sortDirection : ${sortDirections}">
+                    <label class="form-check-label"
+                           th:for="${sortDirection}"
+                           th:text="${sortDirection}">sortDirection:</label>
+                    <input class="form-check-input mt-0"
+                           type="radio"
+                           name="sortDirection"
+                           th:id="${sortDirection}"
+                           th:value="${sortDirection}"
+                           th:checked="${sortDirection.toString() == 'DESC'}"
+                           disabled>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+
+        <table class="table">
+            <thead>
+            <th scope="col">id</th>
+            <th scope="col">status</th>
+            <th scope="col">dateTimeFrom</th>
+            <th scope="col">dateTimeTo</th>
+            <th scope="col">carId</th>
+            <th scope="col">carManufacturer</th>
+            <th scope="col">carModel</th>
+            <th scope="col">preview</th>
+            <th scope="col">feedbackRating</th>
+            <th scope="col">action</th>
+            </thead>
+            <tbody>
+            <tr th:each="request : ${requests.content}">
+                <th><a th:href="@{'/requests/' + ${request.id}}" th:text="${request.id}"></a></th>
+                <th th:text="${request.status}">status</th>
+                <th th:text="${request.dateTimeFrom}">dateTimeFrom</th>
+                <th th:text="${request.dateTimeTo}">dateTimeTo</th>
+                <th th:text="${request.car.id}">dateTimeTo</th>
+                <th th:text="${request.car.manufacturer}">dateTimeTo</th>
+                <th th:text="${request.car.model}">dateTimeTo</th>
+                <th>
+                    <img th:if="${!request.car.carToMediaItems.isEmpty()}"
+                         th:src="@{'/api/v1/media-items/file/' + ${request.car.carToMediaItems.get(0).mediaItem.id}}"
+                         class="img-fluid"
+                         style="max-width: 80px">
+                    <img th:unless="${!request.car.carToMediaItems.isEmpty()}"
+                         th:src="@{/images/car-default.png}"
+                         class="img-fluid"
+                         style="max-width: 80px">
+                </th>
+                <th th:text="${request.feedback?.rating}">feedbackRating</th>
+                <th th:if="${#authentication.principal.authorities[0].toString() == 'OWNER'}">
+                    <form th:action="@{/requests/{requestId}/update(requestId=${request.id})}"
+                          method="post">
+                        <input type="hidden" name="status" value="PROCESSING">
+                        <button class="btn btn-success btn-sm"
+                                type="submit"
+                                th:disabled="${request.status.toString() != 'OPEN'}"
+                        >Accept
+                        </button>
+                    </form>
+                    <form th:action="@{/requests/{requestId}/update(requestId=${request.id})}"
+                          method="post">
+                        <input type="hidden" name="status" value="REJECTED">
+                        <button class="btn btn-danger btn-sm"
+                                type="submit"
+                                th:disabled="${request.status.toString() != 'OPEN'}"
+                        >Reject
+                        </button>
+                    </form>
+                </th>
+                <th th:if="${#authentication.principal.authorities[0].toString() == 'CLIENT'}">
+                    <form th:if="${request.status.toString() == 'OPEN'}"
+                          th:action="@{/requests/{requestId}/update(requestId=${request.id})}"
+                          method="post"
+                    >
+                        <input type="hidden" name="status" value="CANCELED">
+                        <button class="btn btn-danger btn-sm" type="submit">Cancel</button>
+                    </form>
+                </th>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
