@@ -62,7 +62,7 @@ public class AdminControllerIT extends BaseIntegrationTest {
         mockMvc.perform(get("/admins/create"))
                 .andExpectAll(
                         status().is2xxSuccessful(),
-                        view().name("/admin/create")
+                        view().name("admin/create")
                 );
     }
 
