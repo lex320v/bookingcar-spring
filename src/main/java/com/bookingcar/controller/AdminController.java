@@ -43,7 +43,7 @@ public class AdminController {
         model.addAttribute("user", userCreateDto);
         model.addAttribute("genders", Gender.values());
 
-        return "/admin/create";
+        return "admin/create";
     }
 
     @PostMapping
